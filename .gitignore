@@ -11,8 +11,7 @@ venv/
 env/
 .venv/
 
-# Environment secrets
-.env
+
 
 # Database
 db.sqlite3
