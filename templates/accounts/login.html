@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:460px; width:100%;">
+
+    <div style="text-align:center; margin-bottom:1.75rem;">
+        <div style="font-size:2.5rem; margin-bottom:0.5rem;">👋</div>
+        <h2 style="font-size:1.6rem;">Welcome back!</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.25rem;">Sign in to continue to LMS</p>
+    </div>
+
+    <!-- Role Tabs -->
+    <div class="role-tabs" id="roleTabs">
+        <button type="button" class="role-tab active" onclick="switchTab('student')" id="tab-student">
+            🧑‍🎓 Student
+        </button>
+        <button type="button" class="role-tab" onclick="switchTab('teacher')" id="tab-teacher">
+            👨‍🏫 Teacher
+        </button>
+        <button type="button" class="role-tab" onclick="switchTab('admin')" id="tab-admin">
+            🛡️ Admin
+        </button>
+    </div>
+
+    <!-- Role badge shown under tabs -->
+    <div style="text-align:center; margin:0.75rem 0 1.25rem;">
+        <span id="roleBadge" style="
+            display:inline-block; padding:0.3rem 1rem;
+            background:#EEF2FF; color:var(--primary);
+            border-radius:2rem; font-size:0.8rem; font-weight:600;">
+            Signing in as Student
+        </span>
+    </div>
+
+    <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="you@email.com" required autofocus>
+        </div>
+
+        <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <label for="password" style="margin-bottom:0;">Password</label>
+                <a href="{% url 'password_reset' %}" style="font-size:0.8rem; color:var(--primary); text-decoration:none;">Forgot password?</a>
+            </div>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+            Sign In as Student
+        </button>
+    </form>
+
+    <div class="auth-links">
+        <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+    </div>
+</div>
+
+<style>
+.role-tabs {
+    display: flex;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: #F9FAFB;
+}
+.role-tab {
+    flex: 1;
+    padding: 0.65rem 0.5rem;
+    border: none;
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+}
+.role-tab:hover { background: #EEF2FF; color: var(--primary); }
+.role-tab.active {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+</style>
+
+<script>
+const roleLabels = {
+    student: { label: 'Student', emoji: '🧑‍🎓' },
+    teacher: { label: 'Teacher', emoji: '👨‍🏫' },
+    admin:   { label: 'Admin',   emoji: '🛡️'  },
+};
+
+function switchTab(role) {
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + role).classList.add('active');
+    const { label } = roleLabels[role];
+    document.getElementById('roleBadge').textContent = `Signing in as ${label}`;
+    document.getElementById('loginBtn').textContent = `Sign In as ${label}`;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}My Courses - LMS{% endblock %}
+{% block content %}
+<div style="width:100%; max-width:900px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+        <div>
+            <h1 style="font-size:2rem; font-weight:700;">My Enrolled Courses</h1>
+            <p style="color:var(--text-muted); margin-top:0.25rem;">Courses you are currently enrolled in</p>
+        </div>
+        <a href="{% url 'course_list' %}" class="btn btn-outline">Browse All Courses</a>
+    </div>
+
+    {% if enrollments %}
+    <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:3rem;">
+        {% for enrollment in enrollments %}
+        <div style="background:var(--card-bg); border-radius:1rem; padding:1.5rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05); flex-wrap:wrap; gap:1rem;" class="fade-in">
+            <div style="display:flex; align-items:center; gap:1.25rem;">
+                {% if enrollment.course.thumbnail %}
+                    <img src="{{ enrollment.course.thumbnail.url }}" style="width:60px; height:60px; border-radius:0.5rem; object-fit:cover;">
+                {% else %}
+                    <div style="width:60px; height:60px; border-radius:0.5rem; background:linear-gradient(135deg,#4F46E5,#7C3AED); display:flex; align-items:center; justify-content:center; font-size:1.5rem;">📚</div>
+                {% endif %}
+                <div>
+                    <div style="font-weight:700; font-size:1.05rem;">{{ enrollment.course.course_name }}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">Enrolled on {{ enrollment.enrollment_date|date:"M d, Y" }}</div>
+                </div>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+                <a href="{% url 'course_detail' enrollment.course.uuid %}" class="btn btn-primary" style="padding:0.5rem 1.25rem;">Continue</a>
+                <a href="{% url 'unenroll_course' enrollment.course.uuid %}" class="btn btn-outline" style="padding:0.5rem 1rem; color:#EF4444; border-color:#EF4444;">Unenroll</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:3rem 0; color:var(--text-muted); background:var(--card-bg); border-radius:1rem; margin-bottom:3rem;">
+        <p style="font-size:1.1rem;">You haven't enrolled in any courses yet.</p>
+    </div>
+    {% endif %}
+
+    <!-- Pending Requests Section -->
+    {% if pending_requests %}
+    <h2 style="font-size:1.5rem; font-weight:700; margin-bottom:1rem;">⏳ Pending Requests</h2>
+    <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:3rem;">
+        {% for req in pending_requests %}
+        <div style="background:var(--card-bg); border-radius:1rem; padding:1.5rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.05); border:1px solid #FEF3C7;">
+            <div style="display:flex; align-items:center; gap:1.25rem;">
+                <div style="width:50px; height:50px; border-radius:0.5rem; background:#FEF3C7; display:flex; align-items:center; justify-content:center; font-size:1.25rem;">⏳</div>
+                <div>
+                    <div style="font-weight:700;">{{ req.course.course_name }}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">Request sent on {{ req.created_date|date:"M d, Y" }}</div>
+                </div>
+            </div>
+            <span class="btn" style="background:#FEF3C7; color:#92400E; font-size:0.85rem; pointer-events:none;">Awaiting Admin Approval</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Rejected Requests Section -->
+    {% if rejected_requests %}
+    <h2 style="font-size:1.5rem; font-weight:700; margin-bottom:1rem; color:#DC2626;">✗ Rejected Requests</h2>
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+        {% for req in rejected_requests %}
+        <div style="background:#FFF5F5; border-radius:1rem; padding:1.5rem; border:1px solid #FEE2E2;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                <div style="display:flex; align-items:center; gap:1.25rem;">
+                    <div style="width:50px; height:50px; border-radius:0.5rem; background:#FEE2E2; display:flex; align-items:center; justify-content:center; font-size:1.25rem;">✗</div>
+                    <div>
+                        <div style="font-weight:700;">{{ req.course.course_name }}</div>
+                        <div style="font-size:0.85rem; color:#DC2626;">Rejected on {{ req.updated_date|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+                <a href="{% url 'enroll_course' req.course.uuid %}" class="btn btn-outline" style="color:#DC2626; border-color:#DC2626;">Re-apply</a>
+            </div>
+            {% if req.note %}
+            <div style="margin-top:1rem; padding:0.75rem; background:white; border-radius:0.5rem; border:1px solid #FEE2E2; font-size:0.9rem; color:var(--text-muted);">
+                <strong>Reason:</strong> {{ req.note }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

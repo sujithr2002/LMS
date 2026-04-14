@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Module - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:600px;">
+    <h2>{{ action }} Module</h2>
+    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Course: <strong>{{ course.course_name }}</strong></p>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="module_name">Module Name *</label>
+            <input type="text" id="module_name" name="module_name" class="form-control" value="{{ module.module_name|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="module_description">Description</label>
+            <textarea id="module_description" name="module_description" class="form-control" rows="3" style="resize:vertical;">{{ module.module_description|default:'' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="order">Order (position in course)</label>
+            <input type="number" id="order" name="order" class="form-control" value="{{ module.order|default:0 }}" min="0">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem;">
+            <a href="{% url 'course_detail' course.uuid %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ action }} Module</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

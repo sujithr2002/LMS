@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Course - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:600px;">
+    <h2>{{ action }} Course</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="course_name">Course Name *</label>
+            <input type="text" id="course_name" name="course_name" class="form-control" value="{{ course.course_name|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" rows="4" style="resize:vertical;">{{ course.description|default:'' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="teacher">Assign Teacher</label>
+            <select id="teacher" name="teacher" class="form-control">
+                <option value="">-- No teacher assigned --</option>
+                {% for teacher in teachers %}
+                <option value="{{ teacher.id }}" {% if course.teacher_id == teacher.id %}selected{% endif %}>
+                    {{ teacher.first_name }} {{ teacher.last_name }} ({{ teacher.email }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="thumbnail">Thumbnail Image</label>
+            {% if course.thumbnail %}
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem;">Current: <a href="{{ course.thumbnail.url }}" target="_blank">view image</a></p>
+            {% endif %}
+            <input type="file" id="thumbnail" name="thumbnail" class="form-control" accept="image/*">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem;">
+            <a href="{% url 'course_list' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ action }} Course</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

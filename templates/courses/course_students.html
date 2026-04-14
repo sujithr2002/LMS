@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Enrolled Students - {{ course.course_name }}{% endblock %}
+{% block content %}
+<div style="width:100%; max-width:800px;">
+    <a href="{% url 'course_detail' course.uuid %}" style="color:var(--primary); text-decoration:none; font-size:0.9rem;">← Back to Course</a>
+    <div style="margin-top:1.5rem; margin-bottom:2rem;">
+        <h1 style="font-size:1.75rem; font-weight:700;">👥 Enrolled Students</h1>
+        <p style="color:var(--text-muted);">{{ course.course_name }} &bull; {{ enrollments.count }} student{{ enrollments.count|pluralize }}</p>
+    </div>
+
+    {% if enrollments %}
+    <div style="background:var(--card-bg); border-radius:1rem; overflow:hidden; box-shadow:0 4px 8px rgba(0,0,0,0.05);">
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#F9FAFB; font-size:0.85rem; color:var(--text-muted); text-align:left;">
+                    <th style="padding:1rem 1.25rem;">#</th>
+                    <th style="padding:1rem;">Name</th>
+                    <th style="padding:1rem;">Email</th>
+                    <th style="padding:1rem;">Phone</th>
+                    <th style="padding:1rem;">Enrolled On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr style="border-top:1px solid var(--border-color); transition:background 0.2s;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='transparent'">
+                    <td style="padding:1rem 1.25rem; color:var(--text-muted);">{{ forloop.counter }}</td>
+                    <td style="padding:1rem; font-weight:500;">{{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</td>
+                    <td style="padding:1rem; color:var(--text-muted);">{{ enrollment.student.email }}</td>
+                    <td style="padding:1rem; color:var(--text-muted);">{{ enrollment.student.phone|default:"—" }}</td>
+                    <td style="padding:1rem; color:var(--text-muted);">{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:4rem 0; color:var(--text-muted); background:var(--card-bg); border-radius:1rem;">
+        <div style="font-size:3rem; margin-bottom:1rem;">👤</div>
+        <p>No students have enrolled in this course yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

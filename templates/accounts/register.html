@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:500px; width:100%;">
+
+    <div style="text-align:center; margin-bottom:1.75rem;">
+        <div style="font-size:2.5rem; margin-bottom:0.5rem;">🎓</div>
+        <h2 style="font-size:1.6rem;">Create your account</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.25rem;">Join the LMS Platform today</p>
+    </div>
+
+    <!-- Role Selector -->
+    <p style="font-size:0.85rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">I am a…</p>
+    <div class="role-grid" id="roleGrid">
+        <div class="role-card active" data-role="student" onclick="selectRole('student')">
+            <span class="role-icon">🧑‍🎓</span>
+            <span class="role-label">Student</span>
+        </div>
+        <div class="role-card" data-role="teacher" onclick="selectRole('teacher')">
+            <span class="role-icon">👨‍🏫</span>
+            <span class="role-label">Teacher</span>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'register' %}" id="registerForm" style="margin-top:1.5rem;">
+        {% csrf_token %}
+        <input type="hidden" name="role" id="roleInput" value="student">
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" class="form-control" placeholder="John" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Doe" required>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top:1rem;">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="you@email.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" class="form-control" placeholder="+91 9876543210">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required minlength="8">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label for="confirm_password">Confirm</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- Admin code field — hidden unless admin role selected -->
+        <div class="form-group admin-only" id="adminCodeField" style="display:none; margin-top:1rem;">
+            <label for="admin_code">🔑 Admin Registration Code</label>
+            <input type="password" id="admin_code" name="admin_code" class="form-control" placeholder="Enter secret admin code">
+            <small style="color:var(--text-muted);">Contact your system administrator for this code.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.5rem;" id="submitBtn">
+            Create Account
+        </button>
+    </form>
+
+    <div class="auth-links">
+        <p>Already have an account? <a href="{% url 'login' %}">Log in here</a></p>
+    </div>
+</div>
+
+<style>
+.role-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+.role-card {
+    border: 2px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+}
+.role-card:hover {
+    border-color: var(--primary);
+    background: #EEF2FF;
+    transform: translateY(-2px);
+}
+.role-card.active {
+    border-color: var(--primary);
+    background: #EEF2FF;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+.role-icon { font-size: 1.75rem; display: block; }
+.role-label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+</style>
+
+<script>
+function selectRole(role) {
+    document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+    document.querySelector(`[data-role="${role}"]`).classList.add('active');
+    document.getElementById('roleInput').value = role;
+
+    const adminField = document.getElementById('adminCodeField');
+    const adminInput = document.getElementById('admin_code');
+    if (role === 'admin') {
+        adminField.style.display = 'block';
+        adminInput.required = true;
+    } else {
+        adminField.style.display = 'none';
+        adminInput.required = false;
+        adminInput.value = '';
+    }
+}
+</script>
+{% endblock %}

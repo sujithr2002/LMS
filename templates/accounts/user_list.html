@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users - LMS{% endblock %}
+
+{% block content %}
+<div style="max-width:1100px; width:100%;">
+
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.75rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+            <h1 style="font-size:1.6rem; font-weight:800;">👥 User Management</h1>
+            <p style="color:var(--text-muted); margin-top:0.2rem;">Add, edit, activate and remove platform users</p>
+        </div>
+        <a href="{% url 'user_create' %}" class="btn btn-primary" style="padding:0.6rem 1.4rem;">+ Add User</a>
+    </div>
+
+    <!-- Role Filter Tabs + Search -->
+    <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-bottom:1.5rem;">
+        <div class="role-filter-tabs">
+            <a href="?role=all" class="filter-tab {% if role_filter == 'all' %}active{% endif %}">All <span class="filter-count">{{ counts.all }}</span></a>
+            <a href="?role=student" class="filter-tab {% if role_filter == 'student' %}active{% endif %}">Students <span class="filter-count">{{ counts.student }}</span></a>
+            <a href="?role=teacher" class="filter-tab {% if role_filter == 'teacher' %}active{% endif %}">Teachers <span class="filter-count">{{ counts.teacher }}</span></a>
+            <a href="?role=admin" class="filter-tab {% if role_filter == 'admin' %}active{% endif %}">Admins <span class="filter-count">{{ counts.admin }}</span></a>
+        </div>
+        <form method="GET" style="flex:1; min-width:220px; display:flex; gap:0.5rem;">
+            <input type="hidden" name="role" value="{{ role_filter }}">
+            <input type="text" name="q" value="{{ search }}" placeholder="Search by name or email…" class="form-control" style="margin-bottom:0;">
+            <button type="submit" class="btn btn-outline">Search</button>
+        </form>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for u in users %}
+            <tr class="fade-in" style="animation-delay:{{ forloop.counter0 }}0ms;">
+                <td style="color:var(--text-muted);">{{ forloop.counter }}</td>
+                <td>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <div style="width:36px; height:36px; border-radius:50%; background:{% if u.is_admin %}#EDE9FE{% elif u.is_teacher %}#D1FAE5{% else %}#DBEAFE{% endif %}; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; font-size:0.8rem; color:{% if u.is_admin %}#5B21B6{% elif u.is_teacher %}#065F46{% else %}#1D4ED8{% endif %};">
+                            {{ u.first_name|first|upper }}{{ u.last_name|first|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight:600;">{{ u.first_name }} {{ u.last_name }}</div>
+                            <div style="font-size:0.78rem; color:var(--text-muted);">{{ u.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="color:var(--text-muted); font-size:0.85rem;">{{ u.phone|default:"—" }}</td>
+                <td>
+                    {% if u.is_admin %}<span class="badge badge-admin">Admin</span>
+                    {% elif u.is_teacher %}<span class="badge badge-teacher">Teacher</span>
+                    {% else %}<span class="badge badge-student">Student</span>{% endif %}
+                </td>
+                <td>
+                    {% if u.is_active %}
+                        <span style="display:inline-flex; align-items:center; gap:0.3rem; font-size:0.8rem; color:#059669; font-weight:600;">
+                            <span style="width:7px;height:7px;border-radius:50%;background:#10B981;display:inline-block;"></span> Active
+                        </span>
+                    {% else %}
+                        <span style="display:inline-flex; align-items:center; gap:0.3rem; font-size:0.8rem; color:#DC2626; font-weight:600;">
+                            <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;display:inline-block;"></span> Inactive
+                        </span>
+                    {% endif %}
+                </td>
+                <td style="color:var(--text-muted); font-size:0.8rem;">{{ u.created_date|date:"M d, Y" }}</td>
+                <td>
+                    <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                        <a href="{% url 'user_edit' u.id %}" class="btn btn-sm btn-outline">Edit</a>
+                        {% if u != request.user %}
+                            <a href="{% url 'user_toggle' u.id %}" class="btn btn-sm" style="border:1.5px solid {% if u.is_active %}#F59E0B{% else %}#10B981{% endif %}; color:{% if u.is_active %}#92400E{% else %}#065F46{% endif %}; background:{% if u.is_active %}#FEF3C7{% else %}#D1FAE5{% endif %};">
+                                {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </a>
+                            <a href="{% url 'user_delete' u.id %}" class="btn btn-sm" style="color:#DC2626; border:1.5px solid #FECACA; background:#FEF2F2;">Delete</a>
+                        {% else %}
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">You</span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted);">
+                    <div style="font-size:2.5rem; margin-bottom:0.75rem;">👤</div>
+                    No users found matching your criteria.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.role-filter-tabs { display:flex; border-radius:0.5rem; overflow:hidden; border:1.5px solid var(--border); background:#F8FAFC; }
+.filter-tab {
+    padding:0.5rem 1rem; text-decoration:none; color:var(--text-muted);
+    font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    display:flex; align-items:center; gap:0.4rem;
+}
+.filter-tab:hover { background:#EEF2FF; color:var(--primary); }
+.filter-tab.active { background:var(--primary); color:#fff; }
+.filter-count {
+    background:rgba(255,255,255,0.25); border-radius:2rem;
+    padding:0.05rem 0.45rem; font-size:0.72rem;
+}
+.filter-tab:not(.active) .filter-count { background:var(--border); color:var(--text-muted); }
+</style>
+{% endblock %}

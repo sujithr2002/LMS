@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Enrollment Requests - LMS{% endblock %}
+
+{% block content %}
+<div style="max-width:1000px; width:100%;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.75rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+            <h1 style="font-size:1.6rem; font-weight:800;">📋 Enrollment Requests</h1>
+            <p style="color:var(--text-muted); margin-top:0.2rem;">Review and manage student enrollment applications</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline">← Dashboard</a>
+    </div>
+
+    <!-- Status Filter Tabs -->
+    <div class="role-filter-tabs" style="margin-bottom:1.5rem; display:inline-flex;">
+        <a href="?status=pending" class="filter-tab {% if status_filter == 'pending' %}active{% endif %}">
+            Pending <span class="filter-count">{{ counts.pending }}</span>
+        </a>
+        <a href="?status=approved" class="filter-tab {% if status_filter == 'approved' %}active{% endif %}">
+            Approved <span class="filter-count">{{ counts.approved }}</span>
+        </a>
+        <a href="?status=rejected" class="filter-tab {% if status_filter == 'rejected' %}active{% endif %}">
+            Rejected <span class="filter-count">{{ counts.rejected }}</span>
+        </a>
+    </div>
+
+    <div class="card">
+        {% if requests %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Course</th>
+                    <th>Requested</th>
+                    <th>Status</th>
+                    {% if status_filter == 'pending' %}<th>Actions</th>{% endif %}
+                    {% if status_filter == 'rejected' %}<th>Rejection Note</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for req in requests %}
+            <tr class="fade-in">
+                <td style="color:var(--text-muted);">{{ forloop.counter }}</td>
+                <td>
+                    <div style="font-weight:600;">{{ req.student.first_name }} {{ req.student.last_name }}</div>
+                    <div style="font-size:0.78rem; color:var(--text-muted);">{{ req.student.email }}</div>
+                </td>
+                <td>
+                    <a href="{% url 'course_detail' req.course.uuid %}" style="font-weight:600; text-decoration:none; color:var(--primary);">{{ req.course.course_name }}</a>
+                    {% if req.course.teacher %}
+                    <div style="font-size:0.78rem; color:var(--text-muted);">Teacher: {{ req.course.teacher.first_name }} {{ req.course.teacher.last_name }}</div>
+                    {% endif %}
+                </td>
+                <td style="color:var(--text-muted); font-size:0.8rem;">{{ req.created_date|date:"M d, Y" }}</td>
+                <td>
+                    {% if req.status == 'pending' %}
+                        <span class="badge badge-pending">Pending</span>
+                    {% elif req.status == 'approved' %}
+                        <span class="badge badge-graded">Approved</span>
+                    {% else %}
+                        <span style="background:#FEE2E2; color:#DC2626; padding:0.2rem 0.65rem; border-radius:2rem; font-size:0.75rem; font-weight:600;">Rejected</span>
+                    {% endif %}
+                </td>
+                {% if status_filter == 'pending' %}
+                <td>
+                    <div style="display:flex; gap:0.5rem;">
+                        <a href="{% url 'approve_enrollment' req.id %}" class="btn btn-sm" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">✓ Approve</a>
+                        <a href="{% url 'reject_enrollment' req.id %}" class="btn btn-sm" style="background:#FEE2E2; color:#DC2626; border:1px solid #FECACA;">✗ Reject</a>
+                    </div>
+                </td>
+                {% endif %}
+                {% if status_filter == 'rejected' %}
+                <td style="color:var(--text-muted); font-size:0.85rem; font-style:italic;">{{ req.note|default:"No reason given" }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align:center; padding:4rem; color:var(--text-muted);">
+            <div style="font-size:3rem; margin-bottom:1rem;">📭</div>
+            <p>No {{ status_filter }} enrollment requests.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.role-filter-tabs { display:flex; border-radius:0.5rem; overflow:hidden; border:1.5px solid var(--border); background:#F8FAFC; }
+.filter-tab { padding:0.5rem 1rem; text-decoration:none; color:var(--text-muted); font-size:0.85rem; font-weight:500; transition:all 0.2s; display:flex; align-items:center; gap:0.4rem; }
+.filter-tab:hover { background:#EEF2FF; color:var(--primary); }
+.filter-tab.active { background:var(--primary); color:#fff; }
+.filter-count { background:rgba(255,255,255,0.25); border-radius:2rem; padding:0.05rem 0.45rem; font-size:0.72rem; }
+.filter-tab:not(.active) .filter-count { background:var(--border); color:var(--text-muted); }
+</style>
+{% endblock %}

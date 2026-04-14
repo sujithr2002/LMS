@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify OTP - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width: 400px; text-align: center;">
+    <h2>Email Verification</h2>
+    <p style="margin-bottom: 1.5rem; color: var(--text-muted);">
+        We have sent an OTP to <strong>{{ email }}</strong>. Please enter it below to verify your account.
+    </p>
+    <form method="POST" action="{% url 'otp_verify' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="text" id="otp" name="otp" class="form-control" placeholder="Enter 6-digit OTP" required style="font-size: 1.5rem; text-align: center; letter-spacing: 0.5rem;" maxlength="6">
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block">Verify</button>
+    </form>
+    
+    <div class="auth-links">
+        <p>Didn't receive the OTP? <a href="{% url 'register' %}">Go back to register</a></p>
+    </div>
+</div>
+{% endblock %}

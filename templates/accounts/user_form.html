@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} User - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:540px;">
+    <div style="margin-bottom:1.5rem;">
+        <a href="{% url 'user_list' %}" style="color:var(--text-muted); text-decoration:none; font-size:0.85rem;">← Back to Users</a>
+        <h2 style="margin-top:0.75rem; font-size:1.4rem;">{{ action }} User</h2>
+        <p style="color:var(--text-muted); font-size:0.875rem; margin-top:0.25rem;">
+            {% if action == 'Edit' %}Update user details and permissions.
+            {% else %}Admin-created accounts are activated immediately without OTP.{% endif %}
+        </p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Role Selection -->
+        <p style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.6rem;">Role</p>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.6rem; margin-bottom:1.25rem;" id="roleGrid">
+            {% for r, label, icon in role_choices %}
+            <div class="role-card-sm {% if current_role == r or action == 'Create' and r == 'student' and not current_role %}active{% endif %}"
+                 data-role="{{ r }}" onclick="selectRole('{{ r }}')">
+                <span style="font-size:1.4rem;">{{ icon }}</span>
+                <span style="font-size:0.8rem; font-weight:600;">{{ label }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <input type="hidden" name="role" id="roleInput" value="{{ current_role|default:'student' }}">
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label>First Name</label>
+                <input type="text" name="first_name" class="form-control" value="{{ target_user.first_name|default:'' }}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label>Last Name</label>
+                <input type="text" name="last_name" class="form-control" value="{{ target_user.last_name|default:'' }}">
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top:1rem;">
+            <label>Email *</label>
+            <input type="email" name="email" class="form-control" value="{{ target_user.email|default:'' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Phone</label>
+            <input type="text" name="phone" class="form-control" value="{{ target_user.phone|default:'' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Password {% if action == 'Edit' %}<span style="font-weight:400; color:var(--text-muted);">(leave blank to keep current)</span>{% else %}*{% endif %}</label>
+            <input type="password" name="password" class="form-control" {% if action == 'Create' %}required{% endif %} minlength="8">
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:1.5rem;">
+            <a href="{% url 'user_list' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ action }} User</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.role-card-sm {
+    border: 2px solid var(--border);
+    border-radius: 0.625rem;
+    padding: 0.75rem 0.25rem;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s;
+}
+.role-card-sm:hover { border-color: var(--primary); background: var(--primary-light); }
+.role-card-sm.active { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+</style>
+
+<script>
+const DEFAULT_ROLE = "{{ current_role|default:'student' }}";
+document.getElementById('roleInput').value = DEFAULT_ROLE;
+// Mark active
+document.querySelectorAll('.role-card-sm').forEach(c => {
+    if (c.dataset.role === DEFAULT_ROLE) c.classList.add('active');
+});
+
+function selectRole(role) {
+    document.querySelectorAll('.role-card-sm').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[data-role="${role}"]`).classList.add('active');
+    document.getElementById('roleInput').value = role;
+}
+</script>
+{% endblock %}

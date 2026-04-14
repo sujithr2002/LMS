@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Delete User - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:480px; text-align:center;">
+    <div style="font-size:3.5rem; margin-bottom:1rem;">⚠️</div>
+    <h2>Delete User</h2>
+    <p style="color:var(--text-muted); margin:1rem 0 0.5rem;">
+        You are about to permanently delete:
+    </p>
+    <div style="background:#FEF2F2; border:1.5px solid #FECACA; border-radius:0.75rem; padding:1rem; margin:0.75rem 0 1.75rem;">
+        <div style="font-weight:700; font-size:1.05rem;">{{ target_user.first_name }} {{ target_user.last_name }}</div>
+        <div style="color:var(--text-muted); font-size:0.875rem; margin-top:0.25rem;">{{ target_user.email }}</div>
+        <div style="margin-top:0.5rem;">
+            {% if target_user.is_admin %}<span class="badge badge-admin">Admin</span>
+            {% elif target_user.is_teacher %}<span class="badge badge-teacher">Teacher</span>
+            {% else %}<span class="badge badge-student">Student</span>{% endif %}
+        </div>
+    </div>
+    <p style="color:#DC2626; font-size:0.875rem; font-weight:600; margin-bottom:1.5rem;">
+        ⚠️ This action is permanent and cannot be undone. All their data including enrollments and submissions will be removed.
+    </p>
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display:flex; gap:1rem; justify-content:center;">
+            <a href="{% url 'user_list' %}" class="btn btn-outline" style="padding:0.65rem 1.5rem;">Cancel</a>
+            <button type="submit" class="btn btn-primary" style="background:#DC2626; padding:0.65rem 1.5rem;">Yes, Delete User</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

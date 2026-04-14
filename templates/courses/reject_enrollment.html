@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Reject Enrollment - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:480px; text-align:center;">
+    <div style="font-size:3rem; margin-bottom:1rem;">✗</div>
+    <h2>Reject Enrollment Request</h2>
+    <div style="background:#F8FAFC; border-radius:0.75rem; padding:1rem; margin:1rem 0 1.5rem; text-align:left;">
+        <div style="font-weight:600;">{{ req.student.first_name }} {{ req.student.last_name }}</div>
+        <div style="font-size:0.85rem; color:var(--text-muted);">{{ req.student.email }}</div>
+        <div style="margin-top:0.5rem; font-size:0.9rem;">Requesting: <strong>{{ req.course.course_name }}</strong></div>
+    </div>
+    <form method="POST" style="text-align:left;">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="note">Rejection Reason <span style="font-weight:400; color:var(--text-muted);">(optional — student will see this)</span></label>
+            <textarea id="note" name="note" class="form-control" rows="3" placeholder="e.g. Course is full, prerequisites not met..."></textarea>
+        </div>
+        <div style="display:flex; gap:1rem; justify-content:center; margin-top:1rem;">
+            <a href="{% url 'enrollment_requests' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary" style="background:#DC2626;">Confirm Rejection</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

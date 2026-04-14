@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Submissions - {{ assignment.assignment_name }}{% endblock %}
+{% block content %}
+<div style="width:100%; max-width:900px;">
+    <a href="{% url 'course_detail' course.uuid %}" style="color:var(--primary); text-decoration:none; font-size:0.9rem;">← Back to Course</a>
+    <div style="margin-top:1.5rem; margin-bottom:2rem;">
+        <h1 style="font-size:1.75rem; font-weight:700;">Submissions</h1>
+        <p style="color:var(--text-muted);">{{ assignment.assignment_name }} &bull; {{ course.course_name }}</p>
+        <p style="font-size:0.9rem; color:var(--text-muted);">{{ submissions.count }} submission{{ submissions.count|pluralize }} received</p>
+    </div>
+
+    {% if submissions %}
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+        {% for sub in submissions %}
+        <div style="background:var(--card-bg); border-radius:0.75rem; padding:1.25rem; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                    <div style="font-weight:600;">{{ sub.student.first_name }} {{ sub.student.last_name }}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">{{ sub.student.email }}</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.25rem;">Submitted {{ sub.submitted_at|date:"M d, Y H:i" }}</div>
+                </div>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    {% if sub.marks is not None %}
+                    <span style="background:#D1FAE5; color:#065F46; padding:0.25rem 0.75rem; border-radius:0.5rem; font-weight:600; font-size:0.9rem;">{{ sub.marks }} marks</span>
+                    {% else %}
+                    <span style="background:#FEF3C7; color:#92400E; padding:0.25rem 0.75rem; border-radius:0.5rem; font-size:0.85rem;">Not graded</span>
+                    {% endif %}
+                    <a href="{% url 'grade_submission' sub.uuid %}" class="btn btn-primary" style="padding:0.4rem 0.75rem; font-size:0.85rem;">Grade</a>
+                </div>
+            </div>
+
+            {% if sub.submission_type == 'pdf' and sub.pdf_file %}
+            <div style="margin-top:0.75rem;">
+                <a href="{{ sub.pdf_file.url }}" target="_blank" class="btn btn-outline" style="padding:0.35rem 0.75rem; font-size:0.85rem;">📄 View PDF</a>
+            </div>
+            {% elif sub.text_content %}
+            <div style="margin-top:0.75rem; background:#F9FAFB; border-radius:0.5rem; padding:0.75rem; font-size:0.9rem; color:var(--text-main); white-space:pre-wrap;">{{ sub.text_content|truncatewords:50 }}</div>
+            {% endif %}
+
+            {% if sub.feedback %}
+            <div style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-muted);">💬 Feedback: {{ sub.feedback }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:4rem; color:var(--text-muted); background:var(--card-bg); border-radius:1rem;">
+        <div style="font-size:3rem; margin-bottom:1rem;">📭</div>
+        <p>No submissions yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

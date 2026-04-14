@@ -1,0 +1,6 @@
+Task:Create my website hostable on amaazon ec2
+
+Features:
+1.Give a detailed description on how to host it inside readme.md
+2.Create a requirements.txt
+3.If u require any information like the public id etc please ask me

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width: 600px;">
+    <h2>Profile Dashboard</h2>
+    <form method="POST" action="{% url 'profile' %}">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" class="form-control" value="{{ user.first_name }}">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="form-control" value="{{ user.last_name }}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" class="form-control" value="{{ user.phone }}">
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <a href="{% url 'change_password' %}" class="btn btn-outline">Change Password</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

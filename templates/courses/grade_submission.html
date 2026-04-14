@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Grade Submission - LMS{% endblock %}
+{% block content %}
+<div class="auth-card" style="max-width:600px;">
+    <h2>✏️ Grade Submission</h2>
+    <p style="color:var(--text-muted); margin-bottom:1.5rem;">
+        Assignment: <strong>{{ submission.assignment.assignment_name }}</strong><br>
+        Student: <strong>{{ submission.student.first_name }} {{ submission.student.last_name }}</strong> ({{ submission.student.email }})
+    </p>
+
+    <!-- Show the submission -->
+    {% if submission.submission_type == 'pdf' and submission.pdf_file %}
+    <div style="background:#F9FAFB; border-radius:0.5rem; padding:1rem; margin-bottom:1.5rem;">
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem;">Submitted PDF:</p>
+        <a href="{{ submission.pdf_file.url }}" target="_blank" class="btn btn-outline" style="padding:0.35rem 0.75rem; font-size:0.85rem;">📄 Open PDF</a>
+    </div>
+    {% elif submission.text_content %}
+    <div style="background:#F9FAFB; border-radius:0.5rem; padding:1rem; margin-bottom:1.5rem;">
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem;">Text Submission:</p>
+        <div style="font-size:0.9rem; white-space:pre-wrap; color:var(--text-main);">{{ submission.text_content }}</div>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="marks">Marks</label>
+            <input type="number" id="marks" name="marks" class="form-control" step="0.01" min="0"
+                   value="{{ submission.marks|default:'' }}" placeholder="e.g. 85.50">
+        </div>
+        <div class="form-group">
+            <label for="feedback">Feedback (optional)</label>
+            <textarea id="feedback" name="feedback" class="form-control" rows="3" style="resize:vertical;" placeholder="Write feedback for the student...">{{ submission.feedback|default:'' }}</textarea>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem;">
+            <a href="{% url 'assignment_submissions' submission.assignment.uuid %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Grade</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

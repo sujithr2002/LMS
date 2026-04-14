@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ type }} - LMS{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width:480px; text-align:center;">
+    <div style="font-size:3rem; margin-bottom:1rem;">⚠️</div>
+    <h2>Delete {{ type }}</h2>
+    <p style="color:var(--text-muted); margin:1rem 0 2rem;">
+        Are you sure you want to delete <strong>{{ object }}</strong>?
+        This action <strong>cannot be undone</strong> and will remove all associated data.
+    </p>
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display:flex; gap:1rem; justify-content:center;">
+            <a href="javascript:history.back()" class="btn btn-outline" style="padding:0.65rem 1.5rem;">Cancel</a>
+            <button type="submit" class="btn btn-primary" style="background:#EF4444; padding:0.65rem 1.5rem;">Yes, Delete</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

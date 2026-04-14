@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LMS Platform{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="page-wrapper">
+
+        {% if user.is_authenticated %}
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">LMS</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" class="nav-item {% block nav_dashboard %}{% endblock %}">
+                    <span class="nav-icon">🏠</span><span>Dashboard</span>
+                </a>
+                <a href="{% url 'course_list' %}" class="nav-item {% block nav_courses %}{% endblock %}">
+                    <span class="nav-icon">📚</span><span>Courses</span>
+                </a>
+                {% if not user.is_admin and not user.is_teacher %}
+                <a href="{% url 'my_enrollments' %}" class="nav-item">
+                    <span class="nav-icon">🎯</span><span>My Courses</span>
+                </a>
+                {% endif %}
+                {% if user.is_admin %}
+                <a href="{% url 'user_list' %}" class="nav-item">
+                    <span class="nav-icon">👥</span><span>Manage Users</span>
+                </a>
+                <a href="{% url 'enrollment_requests' %}" class="nav-item">
+                    <span class="nav-icon">📋</span><span>Enroll Requests</span>
+                </a>
+                <a href="/admin/" class="nav-item">
+                    <span class="nav-icon">⚙️</span><span>Admin Panel</span>
+                </a>
+                {% endif %}
+                <div class="nav-divider"></div>
+                <a href="{% url 'profile' %}" class="nav-item">
+                    <span class="nav-icon">👤</span><span>Profile</span>
+                </a>
+                <a href="{% url 'change_password' %}" class="nav-item">
+                    <span class="nav-icon">🔒</span><span>Password</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item nav-logout">
+                    <span class="nav-icon">🚪</span><span>Logout</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">
+                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                </div>
+                <div>
+                    <div style="font-weight:600; font-size:0.85rem;">{{ user.first_name }} {{ user.last_name }}</div>
+                    <div style="font-size:0.75rem; color:#94a3b8;">
+                        {% if user.is_admin %}Admin{% elif user.is_teacher %}Teacher{% else %}Student{% endif %}
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile topbar -->
+        <header class="mobile-topbar">
+            <button class="hamburger" onclick="toggleSidebar()" id="hamburger">☰</button>
+            <span class="logo-text" style="font-size:1.1rem;">🎓 LMS</span>
+            <a href="{% url 'profile' %}" style="font-size:1.2rem; text-decoration:none;">👤</a>
+        </header>
+
+        {% else %}
+        <!-- Public navbar -->
+        <header class="public-navbar">
+            <a href="/" class="logo-text" style="text-decoration:none;">🎓 LMS Platform</a>
+            <div style="display:flex; gap:1rem; align-items:center;">
+                <a href="{% url 'login' %}" class="nav-link-pub">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-primary" style="padding:0.5rem 1.25rem;">Register</a>
+            </div>
+        </header>
+        {% endif %}
+
+        <!-- Main content -->
+        <main class="main-content {% if not user.is_authenticated %}public-main{% endif %}">
+
+            {% if messages %}
+            <div class="toast-container">
+                {% for message in messages %}
+                <div class="toast toast-{{ message.tags }} slide-in">
+                    <span>{{ message }}</span>
+                    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:inherit;font-size:1.1rem;margin-left:0.5rem;">✕</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+        // Auto-remove toasts
+        setTimeout(() => {
+            document.querySelectorAll('.toast').forEach(t => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(110%)';
+                setTimeout(() => t.remove(), 400);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
