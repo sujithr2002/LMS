@@ -123,7 +123,7 @@ Visit: `http://127.0.0.1:8000`
 chmod 400 your-key.pem
 
 # Connect
-ssh -i your-key.pem ubuntu@<YOUR_EC2_PUBLIC_IP>
+ssh -i my-aws-key.pem ubuntu@13.51.173.49
 ```
 
 > **Windows users:** You can also use PuTTY (convert `.pem` to `.ppk` with PuTTYgen) or the built-in AWS "Connect" button in the EC2 console.
@@ -153,7 +153,7 @@ git clone <your-repo-url> lms
 cd lms
 
 # Option B: Upload via SCP (from your local machine)
-# scp -i your-key.pem -r /path/to/lms ubuntu@<YOUR_EC2_PUBLIC_IP>:/home/ubuntu/lms
+# scp -i my-aws-key.pem -r . ubuntu@13.51.173.49:~/lms
 ```
 
 Now set up the Python environment:
